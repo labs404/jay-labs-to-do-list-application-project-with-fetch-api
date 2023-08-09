@@ -1,12 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Gochi+Hand&display=swap');
 
-/* 
+body {
+    background-color: #333333;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+    justify-content: center;
+}
 
-    You can write your own styles here...
-    
-    
-    ...Or you can use the import command to include 
-    other sylesheets into your bunde as well, e.j:
-    
-    import 'relative/path/to/stylesheet.scss';
+.todo-container {
+    margin: 50px auto;
+    padding: 0px 0px 0px 100px;
+    width: 700px;
+    min-height: 825px;
+    border: solid 5px #888888;
+    border-radius: 15px;
+    background-color: rgb(255, 235, 200);
+    font-family: 'Gochi Hand', cursive;
+    text-align: left;
+    background-image: url(https://raw.githubusercontent.com/labs404/jay-labs-to-do-list-application-project/d9a07de1c1c15d09896c3de82dff2937b99e1e0b/src/img/notebook-paper.png);
+}
 
-*/
+.todo-h1 {
+    font-size: 60px;
+    padding: 0px;
+    margin: 0px;
+    height: 84px;
+    padding: 0px 0px 0px 13px;
+}
+
+.controlled-input {
+    height: 30px;
+    border: solid 2px rgb(240, 125, 125);
+    border-radius: 5px;
+    width: 582px;
+    margin-bottom: 6px;
+    background-color: transparent;
+    padding: 0px 0px 0px 10px;
+}
+
+::placeholder {
+    color: #AAAAAA;
+}
+
+.task-lines {
+    margin: 0px;
+    padding: 0px 0px 0px 0px;
+    height: 23px;
+    display: flex;
+    font-size: 20px;
+}
+
+.task-lines:hover .trashcan-logo {
+    visibility: visible;
+ }
+ .trashcan-logo {
+     visibility: hidden;
+ }
+
+.individual-task {
+    width: 450px;
+    color: #333333;
+}
+
+.task-lines:hover .individual-task {
+    color:#6d6df8;
+    font-weight: 400;
+    font-size: 22px;
+}
+
+.trashcan-logo {
+    width: 150px;
+    padding: 4px 0px 0px 0px;
+    margin: 0px;
+    display: flex;
+}
+
+.trashcan-img {
+    height: 15px;
+    width: 15px;
+    padding: 0px;
+    margin: 0px;
+    vertical-align: top;
+}
+
+.removeFromTodoButton {
+    border: none;
+    padding: 0px;
+    margin: 0px;
+    background-color: transparent;
+    font-size: 12px;
+    color: #440000;
+    font-style: italic;
+}
+
+.todo-list-content {
+    padding: 0px 0px 0px 10px;
+    color: rgb(240, 125, 125);
+    height: 667px;
+}
+
+.todo-task-counter {
+    font-size: 18px;
+    color: #6d6df8;
+    padding: 0px 0px 0px 10px;
+    position: relative;
+    bottom: 0px;
+    left: 435px;
+}
