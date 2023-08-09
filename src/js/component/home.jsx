@@ -1,12 +1,12 @@
 import React from "react";
-import TodoListTwo from "./todoList2";
+import TodoList from "./todoList";
 
 
 const Home = () => {
 	return (
 		<>
 		<div className="todo-container">
-			<TodoListTwo />
+			<TodoList />
 		</div>
 		</>
 	);

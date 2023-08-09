@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const TodoListTwo = () => {
+const TodoList = () => {
 	const [newTodo, setNewTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
 
@@ -85,4 +85,4 @@ const TodoListTwo = () => {
 	);
 };
 
-export default TodoListTwo;
+export default TodoList;
