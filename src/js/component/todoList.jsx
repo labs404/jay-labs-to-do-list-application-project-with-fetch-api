@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const TodoList = () => {
 	const [newTodo, setNewTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
+    const [counter, setCounter] = useState(0);
 
 
     function play() {
@@ -11,25 +12,58 @@ const TodoList = () => {
         return;
     };
 
+    // function addToTodoList() {
+    //     const duplicateCheck = todoList.filter((word) => word == newTodo); 
+
+    //     if (duplicateCheck.length > 0) {
+    //         alert("Sorry, no duplicate tasks. Please enter a different task.");
+    //         return;
+    //     };
+
+    //     if (todoList.length >= 29) {
+    //         alert("Holy smokes, that's a lot of tasks! Please complete some tasks and come back");
+    //         return;
+    //     };
+
+    //     if (newTodo != "" ) {
+    //         let newArr = [...todoList, newTodo];
+    //         setTodoList(newArr);
+    //         setNewTodo("");
+    //         play();
+    //     };
+    // };
     function addToTodoList() {
-        const duplicateCheck = todoList.filter((word) => word == newTodo);  
-
-        if (duplicateCheck.length > 0) {
-            alert("Sorry, no duplicate tasks. Please enter a different task.");
-            return;
+        let newTodoObject = {
+            done: false,
+            id: counter,
+            label: newTodo
         };
 
-        if (todoList.length >= 29) {
-            alert("Holy smokes, that's a lot of tasks! Please complete some tasks and come back");
-            return;
-        };
+        setTodoList([...todoList, newTodoObject])
+        setCounter(counter + 1);
+        play();
+        setNewTodo("");
+        assignNewTask();
 
-        if (newTodo != "" ) {
-            let newArr = [...todoList, newTodo];
-            setTodoList(newArr);
-            setNewTodo("");
-            play();
-        };
+
+        // const duplicateCheck = todoList.label.filter((word) => word == newTodo); 
+
+        // if (duplicateCheck.length > 0) {
+        //     alert("Sorry, no duplicate tasks. Please enter a different task.");
+        //     return;
+        // };
+
+        // if (todoList.length >= 29) {
+        //     alert("Holy smokes, that's a lot of tasks! Please complete some tasks and come back");
+        //     return;
+        // };
+
+        // if (newTodo != "" ) {
+        //     let newArr = [...todoList, newTodo];
+        //     setTodoList(newArr);
+        //     setNewTodo("");
+        //     play();
+        // };
     };
 
     function removeFromTodoList(itemIdentifier) {
@@ -45,9 +79,9 @@ const TodoList = () => {
 
     let mappedTasks = todoList.map(task => {
         return (
-            <div key={task} className="task-lines">
+            <div key={task.id} className="task-lines">
                 <div className="individual-task">
-                    {task}
+                    {task.label}, {task.done}, {task.id}
                 </div>
                 <div className="trashcan-logo">                
                     <button className="removeFromTodoButton" onClick={() => removeFromTodoList(task)}>
@@ -58,6 +92,39 @@ const TodoList = () => {
             </div>    
         );
     });
+
+    useEffect(() => {
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404")
+        .then(response => response.json())
+        .then(data => {
+            setTodoList(data);
+            setCounter(data.length + 1);
+            console.log("// start useEffect() test");
+            console.log(todoList);
+            console.log("// end useEffect() test");
+        });
+    }, []);
+
+    function assignNewTask() {
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+            method: 'PUT',
+            body: JSON.stringify(todoList),
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (!response.ok) throw Error(res.statusText);
+            return response.json();
+        })
+        .then(response => {
+            console.log('Success: ', response);
+        })
+        .catch(error => console.log(error))
+        console.log("// start assignNewTask() console.log");
+        console.log(todoList);
+        console.log("// end assignNewTask() console.log")
+    }
 
 	return (
 			<div>
