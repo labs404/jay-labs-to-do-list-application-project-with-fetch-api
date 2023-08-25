@@ -13,54 +13,55 @@ const TodoList = () => {
         return;
     };
 
+    function handleKeyPress(key) {
+        if (key.key === "Enter") {
+            addToTodoList();
+        };
+    };
+
     function addToTodoList() {
         let newTodoObject = {
             done: false,
             id: counter,
             label: newTodo
         };
-        setTodoList(() => [...todoList, newTodoObject])
-        setCounter((counter) => counter + 1);
+        setTodoList([...todoList, newTodoObject])
+        setCounter(counter + 1);
         play();
         setNewTodo("");
-        assignNewTask(todoList);
+        assignNewTask();
     };
 
-    function removeFromTodoList(itemIdentifier) {
-        let workingList = todoList.filter(item => item != itemIdentifier);
-        setTodoList(workingList);
+    function assignNewTask() {
+        let newTodoList = [...todoList, { label: newTodo, done: false, id: counter }];
+        setCounter(counter + 1);
         fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
             method: 'PUT',
-            body: JSON.stringify(todoList),
+            body: JSON.stringify(newTodoList),
             headers:{
                 'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())
-        .catch(error => console.log(error))
+                .catch(error => console.log(error))
+                console.log("// start assignNewTask()");
+                console.log(todoList);
+                console.log("// end assignNewTask()")
     };
 
-    function handleKeyPress(key) {
-        if (key.key === "Enter") {
-            addToTodoList(newTodo);
-        };
+    function removeFromTodoList(itemIdentifier) {
+        let workingList = todoList.filter(item => item != itemIdentifier);
+        setTodoList([...workingList]);
+        setCounter(counter + 1);
+        console.log("task deleted successfully");
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+            method: 'PUT',
+            body: JSON.stringify(workingList),
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        })
     };
-
-    let mappedTasks = todoList.map(task => {
-        return (
-            <div key={task.id} className="task-lines">
-                <div className="individual-task">
-                    {task.label}, {task.id}
-                </div>
-                <div className="trashcan-logo">                
-                    <button className="removeFromTodoButton" onClick={() => removeFromTodoList(task)}>
-                        <img className="trashcan-img" src="https://raw.githubusercontent.com/labs404/jay-labs-to-do-list-application-project/5af34e644d3b15174c8a6be259b3bbee3f61ccf6/src/img/trash-can-svgrepo-com.svg" />
-                        &nbsp; delete task..
-                    </button>
-                </div>
-            </div>    
-        );
-    });
 
     useEffect(() => {
         fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404")
@@ -68,15 +69,7 @@ const TodoList = () => {
             if (!response.ok) {
                 setTodoList(placeHolderList);
                 setCounter(placeHolderList.length + 1);
-                fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
-                    method: 'POST',
-                    body: "[]",
-                    headers:{
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .catch(error => console.log(error))
+                createUser();
             }
             else {
                 return response.json();
@@ -93,23 +86,57 @@ const TodoList = () => {
         });
     }, []);
 
-    function assignNewTask() {
+
+    function createUser() {
+        let emptyList = [];
         fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
-            method: 'PUT',
-            body: JSON.stringify(todoList),
+            method: 'POST',
+            body: "[]",
             headers:{
                 'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())
         .catch(error => console.log(error))
-        console.log("// start assignNewTask()");
-        console.log(todoList);
-        console.log("// end assignNewTask()")
+        setTodoList(emptyList);
     };
 
+    function clearList() {
+        let clearList = [];
+        console.log(todoList);
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+            method: 'DELETE',
+            body: "[]",
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .catch(error => console.log(error))
+        setTodoList(clearList);
+        createUser();
+        setTodoList(clearList);
+    };
+
+    let mappedTasks = todoList.map(task => {
+        return (
+            <div key={task.id} className="task-lines">
+                <div className="individual-task">
+                    {task.label}
+                </div>
+                <div className="trashcan-logo">                
+                    <button className="removeFromTodoButton" onClick={() => removeFromTodoList(task)}>
+                        <img className="trashcan-img" src="https://raw.githubusercontent.com/labs404/jay-labs-to-do-list-application-project/5af34e644d3b15174c8a6be259b3bbee3f61ccf6/src/img/trash-can-svgrepo-com.svg" />
+                        &nbsp; delete task..
+                    </button>
+                </div>
+            </div>    
+        );
+    });
+
 	return (
-			<div>
+        <>
+			<div className="todo-container">
 				<div className="todo-h1">
 					Jay's To-Do list
 				</div>
@@ -130,6 +157,8 @@ const TodoList = () => {
 					{todoList.length > 0 ? <>Active tasks: {todoList.length}</> : <></>}
 				</div>
 			</div>
+            <button className="btn btn-danger btn-lg m-1" onClick={() => clearList()}>Clear the List!</button>
+        </>
 	);
 };
 
