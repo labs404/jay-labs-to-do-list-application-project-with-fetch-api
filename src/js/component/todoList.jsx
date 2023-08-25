@@ -5,6 +5,7 @@ const TodoList = () => {
     const [todoList, setTodoList] = useState([]);
     const [counter, setCounter] = useState(0);
 
+    let placeHolderList = [];
 
     function play() {
         var audio = new Audio('https://github.com/labs404/jay-labs-to-do-list-application-project/raw/0fa42c9c528dd65480a721e7f2d28504904751eb/src/sound/pop-sound.mp3');
@@ -12,68 +13,36 @@ const TodoList = () => {
         return;
     };
 
-    // function addToTodoList() {
-    //     const duplicateCheck = todoList.filter((word) => word == newTodo); 
-
-    //     if (duplicateCheck.length > 0) {
-    //         alert("Sorry, no duplicate tasks. Please enter a different task.");
-    //         return;
-    //     };
-
-    //     if (todoList.length >= 29) {
-    //         alert("Holy smokes, that's a lot of tasks! Please complete some tasks and come back");
-    //         return;
-    //     };
-
-    //     if (newTodo != "" ) {
-    //         let newArr = [...todoList, newTodo];
-    //         setTodoList(newArr);
-    //         setNewTodo("");
-    //         play();
-    //     };
-    // };
     function addToTodoList() {
         let newTodoObject = {
             done: false,
             id: counter,
             label: newTodo
         };
-
-        setTodoList([...todoList, newTodoObject])
-        setCounter(counter + 1);
+        setTodoList(() => [...todoList, newTodoObject])
+        setCounter((counter) => counter + 1);
         play();
         setNewTodo("");
-        assignNewTask();
-
-
-        // const duplicateCheck = todoList.label.filter((word) => word == newTodo); 
-
-        // if (duplicateCheck.length > 0) {
-        //     alert("Sorry, no duplicate tasks. Please enter a different task.");
-        //     return;
-        // };
-
-        // if (todoList.length >= 29) {
-        //     alert("Holy smokes, that's a lot of tasks! Please complete some tasks and come back");
-        //     return;
-        // };
-
-        // if (newTodo != "" ) {
-        //     let newArr = [...todoList, newTodo];
-        //     setTodoList(newArr);
-        //     setNewTodo("");
-        //     play();
-        // };
+        assignNewTask(todoList);
     };
 
     function removeFromTodoList(itemIdentifier) {
         let workingList = todoList.filter(item => item != itemIdentifier);
         setTodoList(workingList);
+        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+            method: 'PUT',
+            body: JSON.stringify(todoList),
+            headers:{
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .catch(error => console.log(error))
     };
 
     function handleKeyPress(key) {
         if (key.key === "Enter") {
-            addToTodoList();
+            addToTodoList(newTodo);
         };
     };
 
@@ -81,7 +50,7 @@ const TodoList = () => {
         return (
             <div key={task.id} className="task-lines">
                 <div className="individual-task">
-                    {task.label}, {task.done}, {task.id}
+                    {task.label}, {task.id}
                 </div>
                 <div className="trashcan-logo">                
                     <button className="removeFromTodoButton" onClick={() => removeFromTodoList(task)}>
@@ -95,13 +64,32 @@ const TodoList = () => {
 
     useEffect(() => {
         fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404")
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                setTodoList(placeHolderList);
+                setCounter(placeHolderList.length + 1);
+                fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+                    method: 'POST',
+                    body: "[]",
+                    headers:{
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .catch(error => console.log(error))
+            }
+            else {
+                return response.json();
+            };
+        })
         .then(data => {
-            setTodoList(data);
-            setCounter(data.length + 1);
-            console.log("// start useEffect() test");
-            console.log(todoList);
-            console.log("// end useEffect() test");
+            if (!data) {
+                console.log("API data not found, placeholder array used.");
+            }
+            else {
+                setTodoList(data);
+                setCounter(data.length + 1);
+            }
         });
     }, []);
 
@@ -113,18 +101,12 @@ const TodoList = () => {
                 'Content-Type': 'application/json'
             }
         })
-        .then(response => {
-            if (!response.ok) throw Error(res.statusText);
-            return response.json();
-        })
-        .then(response => {
-            console.log('Success: ', response);
-        })
+        .then(response => response.json())
         .catch(error => console.log(error))
-        console.log("// start assignNewTask() console.log");
+        console.log("// start assignNewTask()");
         console.log(todoList);
-        console.log("// end assignNewTask() console.log")
-    }
+        console.log("// end assignNewTask()")
+    };
 
 	return (
 			<div>
@@ -140,7 +122,6 @@ const TodoList = () => {
                         onKeyDown={(e) => handleKeyPress(e)}
                         placeholder="enter your tasks here!"
 					/>
-					{/* <button className="addToTodoButton" onClick={addToTodoList}>add this task</button> */}
 				</div>
 				<div className="todo-list-content">
                     {todoList.length > 0 ? <>{mappedTasks}</> : <>your to-do list is empty. enter some tasks above.</>}
