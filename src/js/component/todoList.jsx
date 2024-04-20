@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 const TodoList = () => {
 	const [newTodo, setNewTodo] = useState("");
     const [todoList, setTodoList] = useState([]);
-    const [counter, setCounter] = useState(0);
+    // const [counter, setCounter] = useState(0);
 
     let placeHolderList = [];
 
@@ -21,42 +21,42 @@ const TodoList = () => {
 
     function addToTodoList() {
         let newTodoObject = {
-            done: false,
-            id: counter,
-            label: newTodo
+            "is_done": false,
+            // id: counter,
+            "label": newTodo
         };
-        setTodoList([...todoList, newTodoObject])
-        setCounter(counter + 1);
+        let newTodoList = [...todoList, newTodoObject]
+        setTodoList(newTodoList)
+        // setCounter(counter + 1);
         play();
         setNewTodo("");
-        assignNewTask();
+        assignNewTask(newTodoObject);
     };
 
-    function assignNewTask() {
-        let newTodoList = [...todoList, { label: newTodo, done: false, id: counter }];
-        setCounter(counter + 1);
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
-            method: 'PUT',
-            body: JSON.stringify(newTodoList),
+    function assignNewTask(postBody) {
+        // let newTodoListItem = {
+        //     "label": newTodo,
+        //     "is_done": false
+        //   };
+        fetch("https://playground.4geeks.com/todo/todos/labs404",{
+            method: 'POST',
+            body: JSON.stringify(postBody),
             headers:{
                 'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())
                 .catch(error => console.log(error))
-                console.log("// start assignNewTask()");
-                console.log(todoList);
-                console.log("// end assignNewTask()")
+                console.log("assignNewTask() \n",todoList);
     };
 
     function removeFromTodoList(itemIdentifier) {
         let workingList = todoList.filter(item => item != itemIdentifier);
         setTodoList([...workingList]);
-        setCounter(counter + 1);
-        console.log("task deleted successfully");
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
-            method: 'PUT',
-            body: JSON.stringify(workingList),
+        // setCounter(counter + 1);
+        console.log("task deleted successfully \n", itemIdentifier.id);
+        fetch("https://playground.4geeks.com/todo/todos/"+itemIdentifier.id,{
+            method: 'DELETE',
             headers:{
                 'Content-Type': 'application/json'
             }
@@ -64,11 +64,11 @@ const TodoList = () => {
     };
 
     useEffect(() => {
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404")
+        fetch("https://playground.4geeks.com/todo/users/labs404")
         .then(response => {
             if (!response.ok) {
                 setTodoList(placeHolderList);
-                setCounter(placeHolderList.length + 1);
+                // setCounter(placeHolderList.length + 1);
                 createUser();
             }
             else {
@@ -80,8 +80,8 @@ const TodoList = () => {
                 console.log("API data not found, placeholder array used.");
             }
             else {
-                setTodoList(data);
-                setCounter(data.length + 1);
+                setTodoList(data.todos);
+                // setCounter(data.length + 1);
             }
         });
     }, []);
@@ -89,9 +89,9 @@ const TodoList = () => {
 
     function createUser() {
         let emptyList = [];
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+        fetch("https://playground.4geeks.com/todo/users/labs404",{
             method: 'POST',
-            body: "[]",
+            // body: "[]",
             headers:{
                 'Content-Type': 'application/json'
             }
@@ -104,16 +104,16 @@ const TodoList = () => {
     function clearList() {
         let clearList = [];
         console.log(todoList);
-        fetch("https://playground.4geeks.com/apis/fake/todos/user/labs404",{
+        fetch("https://playground.4geeks.com/todo/users/labs404",{
             method: 'DELETE',
-            body: "[]",
+            // body: "[]",
             headers:{
                 'Content-Type': 'application/json'
             }
         })
         .then(response => response.json())
         .catch(error => console.log(error))
-        setTodoList(clearList);
+        // setTodoList(clearList);
         createUser();
         setTodoList(clearList);
     };
